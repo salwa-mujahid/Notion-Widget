@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Auto-rotating Quote Card</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .quote-card {
+      max-width: 400px;
+      padding: 20px;
+      background-color: #fff;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      text-align: center;
+      transition: opacity 1s ease-in-out;
+      opacity: 1;
+    }
+
+    .quote-card.hidden {
+      opacity: 0;
+    }
+
+    .quote {
+      font-style: italic;
+      color: #333;
+      margin-bottom: 10px;
+    }
+
+    .author {
+      text-align: right;
+      color: #777;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="quote-card" id="quoteCard">
+    <div class="quote">"Be yourself; everyone else is already taken."</div>
+    <div class="author">- Oscar Wilde</div>
+  </div>
+
+  <script>
+    const quotes = [
+      {
+        text: "Be yourself; everyone else is already taken.",
+        author: "Oscar Wilde"
+      },
+      {
+        text: "The only way to do great work is to love what you do.",
+        author: "Steve Jobs"
+      },
+      {
+        text: "In three words I can sum up everything I've learned about life: it goes on.",
+        author: "Robert Frost"
+      }
+      // Add more quotes as needed
+    ];
+
+    const quoteCard = document.getElementById("quoteCard");
+    let currentQuoteIndex = 0;
+
+    function showNextQuote() {
+      quoteCard.classList.add("hidden");
+      setTimeout(() => {
+        quoteCard.querySelector(".quote").innerText = `"${quotes[currentQuoteIndex].text}"`;
+        quoteCard.querySelector(".author").innerText = `-${quotes[currentQuoteIndex].author}`;
+        quoteCard.classList.remove("hidden");
+        currentQuoteIndex = (currentQuoteIndex + 1) % quotes.length;
+      }, 1000);
+    }
+
+    // Show the first quote immediately
+    showNextQuote();
+
+    // Rotate quotes every 3 seconds
+    setInterval(showNextQuote, 3000);
+  </script>
+
+</body>
+</html>
