@@ -3,44 +3,40 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Interactive Quote Card</title>
+  <title>Quote Extractor</title>
   <style>
     body {
       font-family: Arial, sans-serif;
       background-color: #191919;
       display: flex;
-      justify-content: center;
+      flex-direction: column;
       align-items: center;
-      height: 100vh;
+      padding: 20px;
+    }
+
+    blockquote {
+      max-width: 600px;
+      margin: 20px 0;
+      padding: 10px;
+      background-color: #191919;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+      text-align: center;
+    }
+
+    blockquote p {
+      font-style: italic;
+      color: white;
+      quotes: "“" "”";
       margin: 0;
     }
 
-    .quote-card {
-      max-width: 400px;
-      padding: 20px;
-      background-color: #191919;
-      border-radius: 8px;
-      border-width: 10px;
-      border-color: white;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-      text-align: center;
-      transition: opacity 1s ease-in-out;
-      opacity: 1;
-    }
-
-    .quote-card.hidden {
-      opacity: 0;
-    }
-
-    .quote {
-      font-style: italic;
-      color:white;
-      margin-bottom: 10px;
-    }
-
-    .author {
+    blockquote cite {
+      display: block;
+      margin-top: 10px;
+      font-size: 14px;
+      color: #c2c2c2;
       text-align: right;
-      color: #777;
     }
 
     button {
@@ -52,7 +48,7 @@
       color: #fff;
       border: none;
       border-radius: 4px;
-      transition: background-color 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+      transition: background-color 0.3s ease-in-out;
     }
 
     button:hover {
@@ -60,58 +56,94 @@
     }
 
     button.clicked {
-      box-shadow: 0 0 10px rgba(255, 255, 255, 0.9);
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
     }
+
   </style>
 </head>
 <body>
 
-  <div class="quote-card" id="quoteCard">
-    <div class="quote">"Be yourself; everyone else is already taken."</div>
-    <div class="author">- Oscar Wilde</div>
-  </div>
+  <input style="color: white;" type="file" id="fileInput" accept=".html">
+  <button id="nextQuoteButton" onclick="extractNextQuote()">Next Quote</button>
 
-  <button id="nextQuoteButton" onclick="showNextQuote()">Next Quote</button>
+  <div id="quoteContainer"></div>
 
   <script>
-    const quotes = [
-      {
-        text: "Be yourself; everyone else is already taken.",
-        author: "Oscar Wilde"
-      },
-      {
-        text: "The only way to do great work is to love what you do.",
-        author: "Steve Jobs"
-      },
-      {
-        text: "In three words I can sum up everything I've learned about life: it goes on.",
-        author: "Robert Frost"
-      }
-      // Add more quotes as needed
-    ];
-
-    const quoteCard = document.getElementById("quoteCard");
-    const nextQuoteButton = document.getElementById("nextQuoteButton");
     let currentQuoteIndex = 0;
 
-    function showNextQuote() {
+    function extractNextQuote() {
+      const fileInput = document.getElementById("fileInput");
+      const quoteContainer = document.getElementById("quoteContainer");
+      const nextQuoteButton = document.getElementById("nextQuoteButton");
 
-      // Add the "clicked" class for a brief moment to show the shadow effect
+      // Effect on the button
       nextQuoteButton.classList.add("clicked");
 
-      quoteCard.classList.add("hidden");
+      // Reset the quote container
+      quoteContainer.innerHTML = "";
 
-      setTimeout(() => {
-        quoteCard.querySelector(".quote").innerText = `"${quotes[currentQuoteIndex].text}"`;
-        quoteCard.querySelector(".author").innerText = `-${quotes[currentQuoteIndex].author}`;
-        quoteCard.classList.remove("hidden");
-        currentQuoteIndex = (currentQuoteIndex + 1) % quotes.length;
-      }, 1000);
+      // Get the selected file
+      const selectedFile = fileInput.files[0];
+
+      if (selectedFile) {
+        const reader = new FileReader();
+
+        reader.onload = function (e) {
+          const htmlContent = e.target.result;
+
+          // Parse the HTML content using DOMParser
+          const parser = new DOMParser();
+          const doc = parser.parseFromString(htmlContent, 'text/html');
+
+          // Extract the content based on HTML tags or class names
+          const paragraphs = doc.querySelectorAll('a');
+
+          // Display the current quote
+          if (currentQuoteIndex < paragraphs.length) {
+            const quoteElement = document.createElement('blockquote');
+            const quoteTextElement = document.createElement('p');
+            quoteTextElement.innerHTML = `“${paragraphs[currentQuoteIndex].textContent}”`;
+            quoteElement.appendChild(quoteTextElement);
+            
+            const authorElement = document.createElement('cite');
+            authorElement.textContent = '- Me';
+            quoteElement.appendChild(authorElement);
+            
+            quoteContainer.appendChild(quoteElement);
+            currentQuoteIndex++;
+
+          } else if (currentQuoteIndex == paragraphs.length) {
+            currentQuoteIndex = 0;
+
+            const quoteElement = document.createElement('blockquote');
+            const quoteTextElement = document.createElement('p');
+            quoteTextElement.innerHTML = `“${paragraphs[currentQuoteIndex].textContent}”`;
+            quoteElement.appendChild(quoteTextElement);
+            
+            const authorElement = document.createElement('cite');
+            authorElement.textContent = '- Me';
+            quoteElement.appendChild(authorElement);
+            
+            quoteContainer.appendChild(quoteElement);
+            currentQuoteIndex++;
+
+          } else {
+            alert("No more quotes available.");
+          }
+        };
+
+        // Read the selected file as text
+        reader.readAsText(selectedFile);
+      } else {
+        alert("Please select an HTML file.");
+      }
 
       setTimeout(() => {
         nextQuoteButton.classList.remove("clicked");
       }, 200);
-      
+
+      // Hide the file input
+      fileInput.style.display = "none";
     }
   </script>
 
