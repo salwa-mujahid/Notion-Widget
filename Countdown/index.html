@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Countdown Timer</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #191919;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    #countdown {
+      font-size: 2em;
+      margin-bottom: 10px;
+    }
+
+    #customCountdownInputs {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 10px;
+      max-width: 300px;
+    }
+
+    #customCountdownInputs input {
+      width: 70px;
+      margin-right: 10px;
+      text-align: center;
+    }
+
+    #startButton {
+      padding: 10px 20px;
+      margin-bottom: 10px;
+      font-size: 16px;
+      cursor: pointer;
+      background-color: #4caf50;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      transition: background-color 0.3s ease-in-out;
+    }
+
+    #startButton:hover {
+      background-color: #2e6d31;
+    }
+  </style>
+</head>
+<body>
+
+  <h1 style="color: white;">Countdown Timer</h1>
+
+  <div id="customCountdownInputs">
+
+    <div id="customCountdownInputs">
+        <div class="inputGroup">
+          <label for="customDays" style="color: white;">Days</label>
+          <input type="number" id="customDays" value="0" min="0" max="365" style="width: 50px; height: 40px; font-size: large;">
+        </div>
+    
+        <div class="inputGroup">
+          <label for="customHours" style="color: white;">Hours</label>
+          <input type="number" id="customHours" value="0" min="0" max="23" style="width: 50px; height: 40px; font-size: large;">
+        </div>
+    
+        <div class="inputGroup">
+          <label for="customMinutes" style="color: white;">Minutes</label>
+          <input type="number" id="customMinutes" value="0" min="0" max="59" style="width: 50px; height: 40px; font-size: large;">
+        </div>
+    
+        <div class="inputGroup">
+          <label for="customSeconds" style="color: white;">Seconds</label>
+          <input type="number" id="customSeconds" value="0" min="0" max="59" style="width: 50px; height: 40px; font-size: large;">
+        </div>
+      </div>
+  </div>
+
+  <button id="startButton" onclick="startCustomCountdown()">Start Countdown</button>
+  <div style="color: white;" id="countdown"></div>
+
+  <script>
+    let customCountdownDate;
+
+    function startCustomCountdown() {
+      const days = parseInt(document.getElementById('customDays').value) || 0;
+      const hours = parseInt(document.getElementById('customHours').value) || 0;
+      const minutes = parseInt(document.getElementById('customMinutes').value) || 0;
+      const seconds = parseInt(document.getElementById('customSeconds').value) || 0;
+
+      // Calculate the total milliseconds for the countdown
+      customCountdownDate = new Date().getTime() + (days * 24 * 60 * 60 * 1000) +
+                                                      (hours * 60 * 60 * 1000) +
+                                                      (minutes * 60 * 1000) +
+                                                      (seconds * 1000);
+
+      // Update the countdown immediately after setting the values
+      updateCustomCountdown();
+
+      // Update the countdown every 1 second
+      const countdownInterval = setInterval(updateCustomCountdown, 1000);
+
+      // Display the remaining time
+      function updateCustomCountdown() {
+        const now = new Date().getTime();
+        const distance = customCountdownDate - now;
+
+        if (distance > 0) {
+          const calculatedDays = Math.floor(distance / (1000 * 60 * 60 * 24));
+          const calculatedHours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+          const calculatedMinutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+          const calculatedSeconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+          const countdownElement = document.getElementById('countdown');
+          countdownElement.innerHTML = formatDays(calculatedDays, 'd') +
+                                        formatHours(calculatedHours, calculatedDays, 'h') +
+                                        formatMinutes(calculatedMinutes, calculatedHours, 'm') +
+                                        formatSeconds(calculatedSeconds, 's');
+        } else {
+          // Display a message when the countdown is over
+          const countdownElement = document.getElementById('countdown');
+          countdownElement.innerHTML = 'Countdown Over';
+          
+          // Clear the interval to stop updating the countdown
+          clearInterval(countdownInterval);
+        }
+      }
+
+      // Helper function to format time units
+      function formatDays(value, unit) {
+          return value > 0 ? `${value}${unit} ` : '';
+        }
+        function formatHours(value, days, unit) {
+          return value > 0 || days > 0 ? `${value}${unit} ` : '';
+        }
+        function formatMinutes(value, hours, unit) {
+          return value > 0 || hours > 0 ? `${value}${unit} ` : '';
+        }
+        function formatSeconds(value, unit) {
+          return `${value}${unit}`;
+        }
+    }
+  </script>
+
+</body>
+</html>
